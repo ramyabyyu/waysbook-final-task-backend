@@ -9,6 +9,7 @@ import (
 func RunMigration() {
 	err := psql.DB.AutoMigrate(
 		&models.User{},
+		&models.Book{},
 	)
 
 	if err != nil {
