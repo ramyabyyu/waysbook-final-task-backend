@@ -5,10 +5,26 @@ import (
 	"fmt"
 	"net/http"
 
+	"waysbook/database"
+	psql "waysbook/pkg/dbConnection"
+
 	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+
+	// ENV config
+	errEnv := godotenv.Load()
+	if errEnv != nil {
+		panic("Failed to load .env file")
+	}
+
+	// Database Init
+	psql.DatabaseInit()
+
+	// Run Migration
+	database.RunMigration()
 
 	r := mux.NewRouter()
 
