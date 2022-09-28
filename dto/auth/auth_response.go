@@ -10,3 +10,10 @@ type AuthResponse struct {
 	Address  string `json:"address"`
 	Token    string `json:"token"`
 }
+
+type BecomeSellerResponse struct {
+	ID       int    `json:"id"`
+	Email    string `json:"email"`
+	IsSeller bool   `json:"is_seller"`
+	Token    string `json:"token"`
+}
