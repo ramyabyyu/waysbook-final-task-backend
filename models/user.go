@@ -11,6 +11,8 @@ type User struct {
 	Gender string `json:"gender" gorm:"type: varchar(255)"`
 	Phone string `json:"phone" gorm:"type: varchar(255)"`
 	Address string `json:"address" gorm:"type: text"`
+	Photo string `json:"photo"`
+	IsPhotoChange bool `json:"is_photo_change"`
 	Books []Book `json:"books"`
 	CreatedAt time.Time `json:"-"`
 	UpdatedAt time.Time `json:"-"`

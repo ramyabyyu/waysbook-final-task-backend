@@ -254,5 +254,4 @@ func (h *handlerBook) UpdateBookThumbnail(w http.ResponseWriter, r *http.Request
 	w.WriteHeader(http.StatusOK)
 	response := dto.SuccessResult{Code: http.StatusOK, Data: bookResponse}
 	json.NewEncoder(w).Encode(response)
-	return
 }

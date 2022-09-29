@@ -75,6 +75,8 @@ func (h *handlerAuth) Register(w http.ResponseWriter, r *http.Request) {
 		Address: "-",
 		IsSeller: false,
 		Phone: "-",
+		Photo: "-",
+		IsPhotoChange: false,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
@@ -102,13 +104,6 @@ func (h *handlerAuth) Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	registerResponse := authdto.AuthResponse {
-		ID: data.ID,
-		FullName: data.FullName,
-		Email: data.Email,
-		IsSeller: data.IsSeller,
-		Gender: data.Gender,
-		Phone: data.Phone,
-		Address: data.Address,
 		Token: token,
 	}
 
@@ -169,13 +164,6 @@ func (h *handlerAuth) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	loginResponse := authdto.AuthResponse{
-		ID: data.ID,
-		FullName: data.FullName,
-		Email: data.Email,
-		IsSeller: data.IsSeller,
-		Gender: data.Gender,
-		Phone: data.Phone,
-		Address: data.Address,
 		Token: token,
 	}
 
@@ -221,9 +209,6 @@ func (h *handlerAuth) BecomeSeller(w http.ResponseWriter, r *http.Request) {
 	}
 
 	becomeSellerResponse := authdto.BecomeSellerResponse{
-		ID: data.ID,
-		Email: data.Email,
-		IsSeller: data.IsSeller,
 		Token: token,
 	}
 
