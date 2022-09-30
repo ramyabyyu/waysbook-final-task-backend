@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 	authdto "waysbook/dto/auth"
 	dto "waysbook/dto/result"
@@ -175,12 +176,14 @@ func (h *handlerAuth) Login(w http.ResponseWriter, r *http.Request) {
 func (h *handlerAuth) BecomeSeller(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	// get user id and is_seller from token
-	userInfo := r.Context().Value("userInfo").(jwt.MapClaims)
-	userId := int(userInfo["id"].(float64))
-	isSeller := userInfo["is_seller"]
+	userId, _ := strconv.Atoi(r.FormValue("user_id"))
+	isSeller, _ := strconv.ParseBool(r.FormValue("is_seller"))
 
-	if isSeller == true {
+	// Get user ID and is seller from request
+	// userId, _ := strconv.Atoi(r.FormValue("user_id"))
+	// isSeller, _ := strconv.ParseBool(r.FormValue("is_seller"))
+
+	if isSeller {
 		w.WriteHeader(http.StatusForbidden)
 		response := dto.ErrorResult{Code: http.StatusForbidden, Message: "You're already become a seller"}
 		json.NewEncoder(w).Encode(response)
