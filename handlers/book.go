@@ -63,21 +63,18 @@ func (h *handlerBook) FindBooks(w http.ResponseWriter, r *http.Request) {
 func (h *handlerBook) CreateBook(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	request := new(bookdto.CreateBookRequest)
-	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		response := dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()}
-		json.NewEncoder(w).Encode(response)
-		return
-	}
+	// get file name
+	dataContext := r.Context().Value("dataPdf")
+	filename := dataContext.(string)
 
-	validation := validator.New()
-	err := validation.Struct(request)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		response := dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()}
-		json.NewEncoder(w).Encode(response)
-		return
+	request := bookdto.CreateBookRequest{
+		Title: r.FormValue("title"),
+		PublicationDate: r.FormValue("publication_date"),
+		Pages: r.FormValue("pages"),
+		ISBN: r.FormValue("ISBN"),
+		Price: r.FormValue("price"),
+		Description: r.FormValue("description"),
+		BookAttachment: r.FormValue("document"),
 	}
 
 	title := request.Title
@@ -101,7 +98,7 @@ func (h *handlerBook) CreateBook(w http.ResponseWriter, r *http.Request) {
 		ISBN: int(isbn),
 		Price: int(price),
 		UserID: userId,
-		BookAttachment: "-",
+		BookAttachment: filename,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
