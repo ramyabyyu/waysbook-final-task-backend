@@ -19,8 +19,9 @@ type UpdateBookRequest struct {
 	Description     string `json:"description" form:"description"`
 }
 
-type UpdateBookAttachmentRequest struct {
-	BookAttachment string `json:"book_attachment" form:"book_attachment"`
+type UpdateBookPromoRequest struct {
+	ID       string `json:"id"`
+	Discount string `json:"discount"`
 }
 
 type UpdateBookThumbnailRequest struct {

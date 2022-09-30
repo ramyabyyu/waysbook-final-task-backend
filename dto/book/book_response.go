@@ -1,6 +1,8 @@
 package bookdto
 
-import "time"
+import (
+	"time"
+)
 
 type BookResponse struct {
 	ID int `json:"id"`
@@ -10,6 +12,9 @@ type BookResponse struct {
 	Pages           int       `json:"pages"`
 	ISBN            int       `json:"ISBN"`
 	Price           int       `json:"price"`
+	IsPromo bool `json:"is_promo"`
+	Discount int `json:"discount"`
+	PriceAfterDiscount int `json:"price_after_discount"`
 	Description     string    `json:"description"`
 	BookAttachment  string    `json:"book_attachment"`
 	Thumbnail       string    `json:"thumbnail"`

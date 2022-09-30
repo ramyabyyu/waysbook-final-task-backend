@@ -9,12 +9,15 @@ type Book struct {
 	PublicationDate time.Time `json:"publication_date"`
 	Pages int `json:"pages"`
 	ISBN int `json:"ISBN"`
-	UserID int `json:"user_id"`
-	User User `json:"user"`
 	Price int `json:"price"`
+	IsPromo bool `json:"is_promo"`
+	Discount int `json:"discount"` //* -> e.g dicount = 45, it means 45%
+	PriceAfterDiscount int `json:"price_after_discount"` //* result from the old price after getting discount promo
 	Description string `json:"description" gorm:"type: text"`
 	BookAttachment string `json:"book_attachment"`
 	Thumbnail string `json:"thumbnail"`
+	UserID int `json:"user_id"`
+	User User `json:"user"`
 	CreatedAt time.Time `json:"-"`
 	UpdatedAt time.Time `json:"-"`
 }

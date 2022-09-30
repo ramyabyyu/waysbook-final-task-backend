@@ -9,10 +9,11 @@ import (
 type BookRepository interface {
 	FindBooks() ([]models.Book, error)
 	GetBookBySlug(slug string) (models.Book, error) // for book detail
-	GetBookByID(ID int) (models.Book, error) // for checking author id in update book attachment and thumbnail
+	GetBookByID(ID int) (models.Book, error) // for checking author id in update book thumbnail
 	CreateBook(book models.Book) (models.Book, error)
-	UpdateBookAttachment(ID int, bookAttachment string) (models.Book, error)
 	UpdateBookThumbnail(ID int, bookThumbnail string) (models.Book, error)
+	GetUserBook(userID int) ([]models.Book, error) // get books that this user sell
+	UpdateBookPromo(ID int, discount int) (models.Book, error) // allow user to make a promo in their book
 }
 
 func RepositoryBook(db *gorm.DB) *repository {
@@ -46,21 +47,33 @@ func (r *repository) CreateBook(book models.Book) (models.Book, error) {
 	return book, err
 }
 
-func (r *repository) UpdateBookAttachment(ID int, bookAttachment string) (models.Book, error) {
-	var book models.Book
-	r.db.First(&book, "id=?", ID)
-
-	book.BookAttachment = bookAttachment
-	err := r.db.Save(&book).Error
-
-	return book, err
-}
-
 func (r *repository) UpdateBookThumbnail(ID int, bookThumbnail string) (models.Book, error) {
 	var book models.Book
 	r.db.First(&book, "id=?", ID)
 
 	book.Thumbnail = bookThumbnail
+	err := r.db.Save(&book).Error
+
+	return book, err
+}
+
+func (r *repository) GetUserBook(userID int) ([]models.Book, error)  {
+	var books []models.Book
+	err := r.db.Find(&books, "user_id=?", userID).Error
+
+	return books, err
+}
+
+func (r *repository) UpdateBookPromo(ID int, discount int) (models.Book, error) {
+	var book models.Book
+	r.db.First(&book, "id=?", ID)
+
+	book.IsPromo = true
+	book.Discount = discount
+	
+	// Calculate Price After Discount
+	book.PriceAfterDiscount = book.Price - (book.Price * discount / 100)
+
 	err := r.db.Save(&book).Error
 
 	return book, err
