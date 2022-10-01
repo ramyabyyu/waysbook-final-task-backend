@@ -18,4 +18,5 @@ func BookRoutes(r *mux.Router) {
 	r.HandleFunc("/update-book-thumbnail/{id}", middlewares.Auth(middlewares.IsSeller(middlewares.UploadImage(h.UpdateBookThumbnail)))).Methods("POST")
 	r.HandleFunc("/get-user-book", middlewares.Auth(middlewares.IsSeller(h.GetUserBook))).Methods("GET")
 	r.HandleFunc("/update-book-promo", middlewares.Auth(middlewares.IsSeller(h.UpdateBookPromo))).Methods("POST")
+	r.HandleFunc("/get-books-promo", h.GetBooksByPromo).Methods("GET")
 }

@@ -48,12 +48,14 @@ func (h *handlerBook) FindBooks(w http.ResponseWriter, r *http.Request) {
 			Pages: book.Pages,
 			ISBN: book.ISBN,
 			Price: book.Price,
+			PriceAfterDiscount: book.PriceAfterDiscount,
 			IsPromo: book.IsPromo,
 			Discount: book.Discount,
 			Description: book.Description,
 			BookAttachment: filePath + book.BookAttachment,
 			Thumbnail: filePath + book.Thumbnail,
 			UserID: book.UserID,
+			Author: book.User.FullName,
 		})
 	}
 
@@ -230,6 +232,7 @@ func (h *handlerBook) GetUserBook(w http.ResponseWriter, r *http.Request) {
 			BookAttachment: filePath + book.BookAttachment,
 			Thumbnail: filePath + book.Thumbnail,
 			UserID: book.UserID,
+			Author: book.User.FullName,
 		})
 	}
 
@@ -274,6 +277,46 @@ func (h *handlerBook) UpdateBookPromo(w http.ResponseWriter, r *http.Request) {
 		BookAttachment: filePath + book.BookAttachment,
 		Thumbnail: filePath + book.Thumbnail,
 		UserID: book.UserID,
+		Author: book.User.FullName,
+	}
+
+	w.WriteHeader(http.StatusOK)
+	response := dto.SuccessResult{Code: http.StatusOK, Data: bookResponse}
+	json.NewEncoder(w).Encode(response)
+}
+
+func (h *handlerBook) GetBooksByPromo(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	books, err := h.BookRepository.GetBooksByPromo()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		response := dto.ErrorResult{Code: http.StatusInternalServerError, Message: err.Error()}
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+
+	filePath := os.Getenv("FILE_PATH")
+
+	bookResponse := make([]bookdto.BookResponse, 0)
+	for _, book := range books {
+		bookResponse = append(bookResponse, bookdto.BookResponse{
+			ID: book.ID,
+			Title: book.Title,
+			Slug: book.Slug,
+			PublicationDate: book.PublicationDate,
+			Pages: book.Pages,
+			ISBN: book.ISBN,
+			Price: book.Price,
+			IsPromo: book.IsPromo,
+			Discount: book.Discount,
+			PriceAfterDiscount: book.PriceAfterDiscount,
+			Description: book.Description,
+			BookAttachment: filePath + book.BookAttachment,
+			Thumbnail: filePath + book.Thumbnail,
+			UserID: book.UserID,
+			Author: book.User.FullName,
+		})
 	}
 
 	w.WriteHeader(http.StatusOK)

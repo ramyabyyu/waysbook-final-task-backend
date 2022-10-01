@@ -19,6 +19,7 @@ type BookResponse struct {
 	BookAttachment  string    `json:"book_attachment"`
 	Thumbnail       string    `json:"thumbnail"`
 	UserID int `json:"user_id"`
+	Author string `json:"author"`
 }
 
 type UpdateBookAttachmentResponse struct {

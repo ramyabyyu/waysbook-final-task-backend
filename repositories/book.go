@@ -14,6 +14,7 @@ type BookRepository interface {
 	UpdateBookThumbnail(ID int, bookThumbnail string) (models.Book, error)
 	GetUserBook(userID int) ([]models.Book, error) // get books that this user sell
 	UpdateBookPromo(ID int, discount int) (models.Book, error) // allow user to make a promo in their book
+	GetBooksByPromo() ([]models.Book, error) // Get books that has promo in it
 }
 
 func RepositoryBook(db *gorm.DB) *repository {
@@ -22,14 +23,14 @@ func RepositoryBook(db *gorm.DB) *repository {
 
 func (r *repository) FindBooks() ([]models.Book, error) {
 	var books []models.Book
-	err := r.db.Find(&books).Error
+	err := r.db.Preload("User").Find(&books).Error
 
 	return books, err
 }
 
 func (r *repository) GetBookBySlug(slug string) (models.Book, error) {
 	var book models.Book
-	err := r.db.First(&book, "slug=?", slug).Error
+	err := r.db.Preload("User").First(&book, "slug=?", slug).Error
 
 	return book, err
 }
@@ -59,7 +60,7 @@ func (r *repository) UpdateBookThumbnail(ID int, bookThumbnail string) (models.B
 
 func (r *repository) GetUserBook(userID int) ([]models.Book, error)  {
 	var books []models.Book
-	err := r.db.Find(&books, "user_id=?", userID).Error
+	err := r.db.Preload("User").Find(&books, "user_id=?", userID).Error
 
 	return books, err
 }
@@ -77,4 +78,12 @@ func (r *repository) UpdateBookPromo(ID int, discount int) (models.Book, error) 
 	err := r.db.Save(&book).Error
 
 	return book, err
+}
+
+func (r *repository) GetBooksByPromo() ([]models.Book, error) {
+	var books []models.Book
+
+	err := r.db.Preload("User").Find(&books, "is_promo=?", true).Error
+
+	return books, err
 }
