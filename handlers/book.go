@@ -64,6 +64,41 @@ func (h *handlerBook) FindBooks(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
+func (h *handlerBook) GetBookBySlug(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	slug := mux.Vars(r)["slug"]
+
+	book, err := h.BookRepository.GetBookBySlug(slug)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		response := dto.ErrorResult{Code: http.StatusInternalServerError, Message: err.Error()}
+		json.NewEncoder(w).Encode(response)
+	}
+
+	bookResponse := bookdto.BookResponse{
+		ID: book.ID,
+		Title: book.Title,
+		Slug: book.Slug,
+		PublicationDate: book.PublicationDate,
+		Pages: book.Pages,
+		Thumbnail: book.Thumbnail,
+		ISBN: book.ISBN,
+		Price: book.Price,
+		IsPromo: book.IsPromo,
+		Discount: book.Discount,
+		PriceAfterDiscount: book.PriceAfterDiscount,
+		Description: book.Description,
+		BookAttachment: book.BookAttachment,
+		UserID: book.UserID,
+		Author: book.User.FullName,
+	}
+
+	w.WriteHeader(http.StatusOK)
+	response := dto.SuccessResult{Code: http.StatusOK, Data: bookResponse}
+	json.NewEncoder(w).Encode(response)
+}
+
 func (h *handlerBook) CreateBook(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 

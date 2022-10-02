@@ -10,6 +10,7 @@ func RunMigration() {
 	err := psql.DB.AutoMigrate(
 		&models.User{},
 		&models.Book{},
+		&models.Cart{},
 	)
 
 	if err != nil {

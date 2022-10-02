@@ -14,6 +14,7 @@ type User struct {
 	Photo string `json:"photo"`
 	IsPhotoChange bool `json:"is_photo_change"`
 	Books []Book `json:"books"`
+	Carts []Cart `json:"carts"`
 	CreatedAt time.Time `json:"-"`
 	UpdatedAt time.Time `json:"-"`
 }
