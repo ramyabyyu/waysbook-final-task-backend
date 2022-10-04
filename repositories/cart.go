@@ -19,7 +19,7 @@ func RepositoryCart(db *gorm.DB) *repository {
 
 func (r *repository) FindCartsByUserID(userID int) ([]models.Cart, error) {
 	var carts []models.Cart
-	err := r.db.Where("user_id=?", userID).Find(&carts).Error
+	err := r.db.Where("user_id=?", userID).Preload("User").Preload("Book").Find(&carts).Error
 
 	return carts, err
 }

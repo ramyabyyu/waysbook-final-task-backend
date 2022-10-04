@@ -8,6 +8,7 @@ type Book struct {
 	Slug string `json:"slug"`
 	PublicationDate time.Time `json:"publication_date"`
 	Pages int `json:"pages"`
+	Author string `json:"author"`
 	ISBN int `json:"ISBN"`
 	Price int `json:"price"`
 	IsPromo bool `json:"is_promo"`
@@ -22,10 +23,26 @@ type Book struct {
 	UpdatedAt time.Time `json:"-"`
 }
 
+type BookCart struct {
+	ID int `json:"id"`
+	Title           string `json:"title" gorm:"type: varchar(255)"`
+	Slug string `json:"slug"`
+	Author string `json:"author"`
+	Price int `json:"price"`
+	IsPromo bool `json:"is_promo"`
+	Discount int `json:"discount"` //* -> e.g dicount = 45, it means 45%
+	PriceAfterDiscount int `json:"price_after_discount"` //* result from the old price after getting discount promo
+	Thumbnail string `json:"thumbnail"`
+}
+
 type UserBook struct {
 	ID int `json:"id"`
 }
 
 func (UserBook) TableName() string {
+	return "books"
+}
+
+func (BookCart) TableName() string {
 	return "books"
 }

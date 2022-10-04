@@ -55,7 +55,7 @@ func (h *handlerBook) FindBooks(w http.ResponseWriter, r *http.Request) {
 			BookAttachment: filePath + book.BookAttachment,
 			Thumbnail: filePath + book.Thumbnail,
 			UserID: book.UserID,
-			Author: book.User.FullName,
+			Author: book.Author,
 		})
 	}
 
@@ -76,22 +76,24 @@ func (h *handlerBook) GetBookBySlug(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(response)
 	}
 
+	filePath := os.Getenv("FILE_PATH") 
+
 	bookResponse := bookdto.BookResponse{
 		ID: book.ID,
 		Title: book.Title,
 		Slug: book.Slug,
 		PublicationDate: book.PublicationDate,
 		Pages: book.Pages,
-		Thumbnail: book.Thumbnail,
+		Thumbnail: filePath + book.Thumbnail,
 		ISBN: book.ISBN,
 		Price: book.Price,
 		IsPromo: book.IsPromo,
 		Discount: book.Discount,
 		PriceAfterDiscount: book.PriceAfterDiscount,
 		Description: book.Description,
-		BookAttachment: book.BookAttachment,
+		BookAttachment: filePath + book.BookAttachment,
 		UserID: book.UserID,
-		Author: book.User.FullName,
+		Author: book.Author,
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -102,18 +104,24 @@ func (h *handlerBook) GetBookBySlug(w http.ResponseWriter, r *http.Request) {
 func (h *handlerBook) CreateBook(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	// get file name
-	dataContext := r.Context().Value("dataPdf")
-	filename := dataContext.(string)
+	// get pdf name for book attachment
+	dataPdfContext := r.Context().Value("dataPdf")
+	pdfName := dataPdfContext.(string)
+
+	// get image name for thumbnail
+	dataImageContext := r.Context().Value("dataImage")
+	imageName := dataImageContext.(string)
 
 	request := bookdto.CreateBookRequest{
 		Title: r.FormValue("title"),
+		Author: r.FormValue("author"),
 		PublicationDate: r.FormValue("publication_date"),
 		Pages: r.FormValue("pages"),
 		ISBN: r.FormValue("ISBN"),
 		Price: r.FormValue("price"),
 		Description: r.FormValue("description"),
 		BookAttachment: r.FormValue("document"),
+		Thumbnail: r.FormValue("image"),
 	}
 
 	title := request.Title
@@ -129,7 +137,8 @@ func (h *handlerBook) CreateBook(w http.ResponseWriter, r *http.Request) {
 
 	book := models.Book{
 		Title: title,
-		Thumbnail: "-",
+		Thumbnail: imageName,
+		Author: request.Author,
 		Slug: slug.GenerateSlug(title),
 		Description: request.Description,
 		PublicationDate: publicationDate,
@@ -140,7 +149,7 @@ func (h *handlerBook) CreateBook(w http.ResponseWriter, r *http.Request) {
 		Discount: 0,
 		PriceAfterDiscount: 0,
 		UserID: userId,
-		BookAttachment: filename,
+		BookAttachment: pdfName,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
@@ -166,6 +175,7 @@ func (h *handlerBook) CreateBook(w http.ResponseWriter, r *http.Request) {
 		BookAttachment: filePath + newBook.BookAttachment,
 		Thumbnail: filePath + newBook.Thumbnail,
 		UserID: newBook.UserID,
+		Author: newBook.Author,
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -267,7 +277,7 @@ func (h *handlerBook) GetUserBook(w http.ResponseWriter, r *http.Request) {
 			BookAttachment: filePath + book.BookAttachment,
 			Thumbnail: filePath + book.Thumbnail,
 			UserID: book.UserID,
-			Author: book.User.FullName,
+			Author: book.Author,
 		})
 	}
 
@@ -312,7 +322,7 @@ func (h *handlerBook) UpdateBookPromo(w http.ResponseWriter, r *http.Request) {
 		BookAttachment: filePath + book.BookAttachment,
 		Thumbnail: filePath + book.Thumbnail,
 		UserID: book.UserID,
-		Author: book.User.FullName,
+		Author: book.Author,
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -350,7 +360,7 @@ func (h *handlerBook) GetBooksByPromo(w http.ResponseWriter, r *http.Request) {
 			BookAttachment: filePath + book.BookAttachment,
 			Thumbnail: filePath + book.Thumbnail,
 			UserID: book.UserID,
-			Author: book.User.FullName,
+			Author: book.Author,
 		})
 	}
 

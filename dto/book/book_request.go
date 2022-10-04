@@ -2,12 +2,14 @@ package bookdto
 
 type CreateBookRequest struct {
 	Title           string `json:"title" form:"title" validate:"required"`
+	Author          string `json:"author" form:"author" validate:"required"`
 	PublicationDate string `json:"publication_date" form:"publication_date" validate:"required"`
 	Pages           string `json:"pages" form:"pages" validate:"required"`
 	ISBN            string `json:"ISBN" form:"ISBN" validate:"required"`
 	Price           string `json:"price" form:"price" validate:"required"`
 	Description     string `json:"description" form:"description" validate:"required"`
 	BookAttachment  string `json:"book_attachment" form:"book_attachment"`
+	Thumbnail       string `json:"thumbnail" form:"thumbnail"`
 }
 
 type UpdateBookRequest struct {
