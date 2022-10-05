@@ -84,6 +84,22 @@ func (h *handlerAuth) Register(w http.ResponseWriter, r *http.Request) {
 
 	data, err := h.AuthRepository.Register(user)
 
+	// create new cart
+	cart := models.Cart{
+		UserID: data.ID,
+		IsPay: false,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+
+	_, errCart := h.AuthRepository.CreateCart(cart)
+	if errCart != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		response := dto.ErrorResult{Code: http.StatusInternalServerError, Message: err.Error()}
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		response := dto.ErrorResult{Code: http.StatusInternalServerError, Message: err.Error()}

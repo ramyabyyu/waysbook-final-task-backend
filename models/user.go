@@ -13,8 +13,8 @@ type User struct {
 	Address string `json:"address" gorm:"type: text"`
 	Photo string `json:"photo"`
 	IsPhotoChange bool `json:"is_photo_change"`
-	Books []Book `json:"books"`
-	Carts []Cart `json:"carts"`
+	Books []Book `json:"books"` // -> Every user can sell many books
+	Carts []Cart `json:"carts"` // -> Every user can have many carts that contain many books that about to purchased
 	CreatedAt time.Time `json:"-"`
 	UpdatedAt time.Time `json:"-"`
 }

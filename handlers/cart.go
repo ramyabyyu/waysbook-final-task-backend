@@ -5,13 +5,11 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"time"
 	cartdto "waysbook/dto/cart"
 	dto "waysbook/dto/result"
 	"waysbook/models"
 	"waysbook/repositories"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v4"
 )
 
@@ -19,40 +17,40 @@ type handlerCart struct {
 	CartRepository repositories.CartRepository
 }
 
-func HandlerCart(CartRepository repositories.CartRepository) *handlerCart {
+func HanlderCart(CartRepository repositories.CartRepository) *handlerCart {
 	return &handlerCart{CartRepository}
 }
 
-func (h *handlerCart) FindCartsByUserID(w http.ResponseWriter, r *http.Request) {
+func (h *handlerCart) FindCartItems(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	// Get User ID from token
-	userInfo := r.Context().Value("userInfo").(jwt.MapClaims)
-	userId := int(userInfo["id"].(float64))
+	request := cartdto.GetCartItemRequest{
+		CartID: r.FormValue("cart_id"),
+	}
 
-	carts, err := h.CartRepository.FindCartsByUserID(userId)
+	cartId, _ := strconv.Atoi(request.CartID)
+
+	cartItems, err := h.CartRepository.FindCartItems(cartId)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		response := dto.ErrorResult{Code: http.StatusInternalServerError, Message: err.Error()}
+		w.WriteHeader(http.StatusBadRequest)
+		response := dto.ErrorResult{Code: http.StatusBadRequest, Message: "Cart not found"}
 		json.NewEncoder(w).Encode(response)
 		return
 	}
 
-	filePath := os.Getenv("FILE_PATH")
-
-	cartResponse := make([]cartdto.CartResponse, 0)
-	for _, cart := range carts {
-		cartResponse = append(cartResponse, cartdto.CartResponse{
-			ID: cart.ID,
-			QTY: cart.QTY,
-			Subtotal: cart.Subtotal,
-			SellerID: cart.SellerID,
-			BookID: cart.BookID,
-			UserID: userId,
-			BookTitle: cart.Book.Title,
-			Slug: cart.Book.Slug,
-			BookThumbnail: filePath + cart.Book.Thumbnail,
-			Author: cart.Book.Author,
+	cartResponse := make([]cartdto.CartItemResponse, 0)
+	for _, cartItem := range cartItems {
+		cartResponse = append(cartResponse, cartdto.CartItemResponse{
+			ID: cartItem.ID,
+			BookID: cartItem.BookID,
+			BookTitle: cartItem.BookTitle,
+			BookThumbnail: cartItem.BookThumbnail,
+			Price: cartItem.Price,
+			Qty: cartItem.Qty,
+			UserID: cartItem.Cart.UserID,
+			BuyerName: cartItem.BuyerName,
+			SellerID: cartItem.SellerID,
+			SellerName: cartItem.SellerName,
 		})
 	}
 
@@ -61,96 +59,73 @@ func (h *handlerCart) FindCartsByUserID(w http.ResponseWriter, r *http.Request) 
 	json.NewEncoder(w).Encode(response)
 }
 
-func (h *handlerCart) AddCart(w http.ResponseWriter, r *http.Request) {
+func (h *handlerCart) CreateCartItem(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	// get user from token
+	// get data user token
 	userInfo := r.Context().Value("userInfo").(jwt.MapClaims)
 	userId := int(userInfo["id"].(float64))
 
-	request := cartdto.CreateCartRequest{
-		SellerID: r.FormValue("seller_id"),
+	// Get BookID from request
+	request := cartdto.CreateCartItemRequest{
 		BookID: r.FormValue("book_id"),
-		SubTotal: r.FormValue("subtotal"),
+		CartID: r.FormValue("cart_id"),
 	}
 
-	validation := validator.New()
-	err := validation.Struct(request)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		response := dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()}
-		json.NewEncoder(w).Encode(response)
-	}
-
-	sellerId, _ := strconv.Atoi(request.SellerID)
+	// convert bookID and cartID from string to int
 	bookId, _ := strconv.Atoi(request.BookID)
-	subtotal, _ := strconv.Atoi(request.SubTotal)
+	cartId, _ := strconv.Atoi(request.CartID)
 
-	cart := models.Cart{
-		QTY: 1,
-		Subtotal: subtotal,
-		BookID: bookId,
-		SellerID: sellerId,
-		UserID: userId,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-	}
-
-	newCart, err := h.CartRepository.AddCart(cart)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		response := dto.ErrorResult{Code: http.StatusInternalServerError, Message: err.Error()}
-		json.NewEncoder(w).Encode(response)
-		return
-	}
-
-	w.WriteHeader(http.StatusCreated)
-	response := dto.SuccessResult{Code: http.StatusCreated, Data: newCart}
-	json.NewEncoder(w).Encode(response)
-}
-
-func (h *handlerCart) DeleteCart(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
-	request := cartdto.DeleteCartRequest{
-		ID: r.FormValue("cart_id"),
-		UserID: r.FormValue("user_id"),
-	}
-
-	cartId, _ := strconv.Atoi(request.ID)
-	userId, _ := strconv.Atoi(request.UserID)
-
-	cart, err := h.CartRepository.GetCartByID(int(cartId))
+	// Get Book Data
+	book, err := h.CartRepository.GetBook(bookId)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		response := dto.ErrorResult{Code: http.StatusBadRequest, Message: "Error nya disini"}
+		response := dto.ErrorResult{Code: http.StatusBadRequest, Message: "Book not found"}
 		json.NewEncoder(w).Encode(response)
 		return
 	}
 
-	if cart.UserID != int(userId) {
-		w.WriteHeader(http.StatusForbidden)
-		response := dto.ErrorResult{Code: http.StatusForbidden, Message: "You can't delete someone else's cart! Please just delete yours"}
-		json.NewEncoder(w).Encode(response)
-		return
-	}
-
-	data, err := h.CartRepository.DeleteCart(cart)
-	if err != nil {
+	// Get User Data
+	user, errUser := h.CartRepository.GetUser(userId)
+	if errUser != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		response := dto.ErrorResult{Code: http.StatusInternalServerError, Message: err.Error()}
 		json.NewEncoder(w).Encode(response)
 		return
 	}
 
-	// allCarts, err := h.CartRepository.FindCartsByUserID()
+	filePath := os.Getenv("FILE_PATH")
 
-	cartResponse := cartdto.DeleteCartResponse{
-		ID: data.ID,
-		Message: "Deleting cart success!",
+	// check if book has promo
+	var bookPrice int
+	if book.PriceAfterDiscount == 0 {
+		bookPrice = book.Price
+	} else {
+		bookPrice = book.PriceAfterDiscount
+	}
+
+	newCartItem := models.CartItem{
+		CartID: cartId,
+		BookID: book.ID,
+		BookTitle: book.Title,
+		BookThumbnail: filePath + book.Thumbnail,
+		UserID: user.ID,
+		BuyerName: user.FullName,
+		SellerID: book.UserID,
+		SellerName: book.User.FullName,
+		Qty: 1,
+		Price: bookPrice,
+	}
+
+	data, err := h.CartRepository.CreateCartItem(newCartItem)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		response := dto.ErrorResult{Code: http.StatusInternalServerError, Message: err.Error()}
+		json.NewEncoder(w).Encode(response)
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-	response := dto.SuccessResult{Code: http.StatusOK, Data: cartResponse}
+	response := dto.SuccessResult{Code: http.StatusOK, Data: data}
 	json.NewEncoder(w).Encode(response)
 }

@@ -126,7 +126,7 @@ func (h *handlerBook) CreateBook(w http.ResponseWriter, r *http.Request) {
 
 	title := request.Title
 
-	publicationDate, _ := dateformat.ConvertStrToDate(request.PublicationDate)
+	publicationDate := dateformat.ConvertStrToDate(request.PublicationDate)
 	pages, _ := strconv.Atoi(request.Pages)
 	isbn, _ := strconv.Atoi(request.ISBN)
 	price, _ := strconv.Atoi(request.Price)

@@ -11,9 +11,8 @@ import (
 
 func CartRoutes(r *mux.Router) {
 	cartRepository := repositories.RepositoryCart(psql.DB)
-	h := handlers.HandlerCart(cartRepository)
+	h := handlers.HanlderCart(cartRepository)
 
-	r.HandleFunc("/carts", middlewares.Auth(h.FindCartsByUserID)).Methods("GET")
-	r.HandleFunc("/cart", middlewares.Auth(h.AddCart)).Methods("POST")
-	r.HandleFunc("/delete-cart", h.DeleteCart).Methods("POST")
+	r.HandleFunc("/carts", middlewares.Auth(h.FindCartItems)).Methods("GET")
+	r.HandleFunc("/cart", middlewares.Auth(h.CreateCartItem)).Methods("POST")
 }

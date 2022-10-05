@@ -2,14 +2,10 @@ package dateformat
 
 import "time"
 
-func ConvertStrToDate(dateString string) (time.Time, error) {
+func ConvertStrToDate(dateString string) (time.Time) {
 
 	layout := "2006-01-02"
-	date, err := time.Parse(layout, dateString)
-	
-	if err != nil {
-		return time.Now(), err
-	}
+	date, _ := time.Parse(layout, dateString)
 
-	return date, err
+	return date
 }

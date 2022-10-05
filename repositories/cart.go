@@ -7,38 +7,42 @@ import (
 )
 
 type CartRepository interface {
-	FindCartsByUserID(userID int) ([]models.Cart, error)
-	AddCart(cart models.Cart) (models.Cart, error)
-	GetCartByID(ID int) (models.Cart, error)
-	DeleteCart(cart models.Cart) (models.Cart, error)
+	FindCartItems(cartID int) ([]models.CartItem, error)
+	GetBook(bookID int) (models.Book, error)
+	GetUser(userID int) (models.User, error)
+	CreateCartItem(cartItem models.CartItem) (models.CartItem, error)
 }
 
 func RepositoryCart(db *gorm.DB) *repository {
 	return &repository{db}
 }
 
-func (r *repository) FindCartsByUserID(userID int) ([]models.Cart, error) {
-	var carts []models.Cart
-	err := r.db.Where("user_id=?", userID).Preload("User").Preload("Book").Find(&carts).Error
+func (r *repository) FindCartItems(cartID int) ([]models.CartItem, error) {
+	var cartItems []models.CartItem
 
-	return carts, err
+	err := r.db.Where("cart_id=?", cartID).Preload("Cart").Preload("Cart.User").Find(&cartItems).Error
+
+	return cartItems, err
 }
 
-func (r *repository) AddCart(cart models.Cart) (models.Cart, error) {
-	err := r.db.Create(&cart).Error
+func (r *repository) GetBook(bookID int) (models.Book, error) {
+	var book models.Book
 
-	return cart, err
+	err := r.db.Where("id=?", bookID).Preload("User").Find(&book).Error
+
+	return book, err
 }
 
-func (r *repository) GetCartByID(ID int) (models.Cart, error) {
-	var cart models.Cart
-	err := r.db.First(&cart, "id=?", ID).Error
+func (r *repository) GetUser(userID int) (models.User, error) {
+	var user models.User
 
-	return cart, err
+	err := r.db.Where("id=?", userID).Find(&user).Error
+
+	return user, err
 }
 
-func (r *repository) DeleteCart(cart models.Cart) (models.Cart, error) {
-	err := r.db.Delete(&cart).Error
+func (r *repository) CreateCartItem(cartItem models.CartItem) (models.CartItem, error) {
+	err := r.db.Create(&cartItem).Error
 
-	return cart, err
+	return cartItem, err
 }
