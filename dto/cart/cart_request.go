@@ -1,12 +1,9 @@
 package cartdto
 
-type CreateCartItemRequest struct {
-	BookID string `json:"book_id" form:"book_id"`
-	CartID string `json:"cart_id" form:"cart_id"`
-}
-
-type GetCartItemRequest struct {
-	CartID string `json:"cart_id"`
+type CreateCartRequest struct {
+	BookID   string `json:"book_id" form:"book_id"`
+	SellerID string `json:"seller_id" form:"seller_id"`
+	SubTotal string `json:"subtotal" form:"subtotal"`
 }
 
 type DeleteCartRequest struct {

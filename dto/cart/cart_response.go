@@ -1,17 +1,18 @@
 package cartdto
 
-type CartItemResponse struct {
+type CartResponse struct {
 	ID            int    `json:"id"`
-	UserID        int    `json:"user_id"`   // buyer
-	SellerID      int    `json:"seller_id"` // seller
+	QTY           int    `json:"qty"`
+	Subtotal      int    `json:"subtotal"`
+	SellerID      int    `json:"seller_id"`
 	BookID        int    `json:"book_id"`
-	BuyerName     string `json:"buyer_name"`
-	SellerName    string `json:"seller_name"`
+	UserID        int    `json:"user_id"`
 	BookTitle     string `json:"book_title"`
 	BookThumbnail string `json:"book_thumbnail"`
-	Price         int    `json:"price"`
-	Qty           int    `json:"qty"`
+	Author        string `json:"author"`
+	Slug          string `json:"slug"`
 }
+
 type DeleteCartResponse struct {
 	ID      int    `json:"id"`
 	Message string `json:"message"`
