@@ -1,6 +1,6 @@
 package transactiondto
 
 type TransactionRequest struct {
-	CartID string `json:"cart_id"`
+	UserID string `json:"user_id"`
 	Total  string `json:"total"`
 }

@@ -9,3 +9,8 @@ type ErrorResult struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
 }
+
+type SuccessNoDataResult struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+}
